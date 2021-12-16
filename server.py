@@ -29,10 +29,11 @@ while True:
     sock.bind((HOST, PORT))
     sock.listen(1)
     conn, addr = sock.accept()
-    #p, g, a = 7, 5, 3
     p, g, a, A = encoding.gen_key_server()
+    print(f"Тайный ключ:{a}\nПубличный ключ: {p}, {g}, {A}")
     encoding.send_key((p, g, A), conn)
     K = encoding.get_K_server(a, p, conn)
+    print(f"Общий ключ: {K}")
     if K != "CONNECTION_ERROR":
         if len(pool) == len(chosen):
             sock.send(encoding.encrypt("CONNECTION_ERROR", K))
@@ -44,5 +45,6 @@ while True:
 
         conn.send(encoding.encrypt(port_number, K).encode())
         sock.close()
+        print(f"Общение происходит на порту: {port_number}")
         threads.append(Thread(target=IO, args=[port_number]))
         threads[len(threads)-1].start()
